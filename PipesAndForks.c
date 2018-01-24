@@ -9,7 +9,7 @@
 -- int main(void)
 --
 --
--- DATE: January 24, 2018
+-- DATE: January 23, 2018
 --
 -- REVISIONS: None
 --
@@ -49,7 +49,7 @@ char* line_kill(char *str, int i);
 /*------------------------------------------------------------------------------------------------------------------
 -- FUNCTION: main
 --
--- DATE: March 16, 2018
+-- DATE: January 23, 2018
 --
 -- REVISIONS: None
 --
@@ -204,7 +204,7 @@ int main(void)
 /*------------------------------------------------------------------------------------------------------------------
 -- FUNCTION: translater
 --
--- DATE: March 16, 2018
+-- DATE: January 23, 2018
 --
 -- REVISIONS: None
 --
@@ -226,7 +226,7 @@ char *translater(char *word) {
     int len = strlen(word);
     int i;
     char *final = malloc(len+1);
-    //Line Kill
+    //Line Kills
     for(i=0; i<=len; i++) {
         if(word[i] == 'K')
         {
@@ -237,7 +237,7 @@ char *translater(char *word) {
         }
     }
 
-    //Deletion
+    //Backspaces
     for(i=0; i<=len; i++) {
         if(word[i] == 'X')
         {
@@ -283,7 +283,7 @@ char *translater(char *word) {
 /*------------------------------------------------------------------------------------------------------------------
 -- FUNCTION: delete_char
 --
--- DATE: March 16, 2018
+-- DATE: January 23, 2018
 --
 -- REVISIONS: None
 --
@@ -319,7 +319,7 @@ void delete_char(char *str, int i)
 /*------------------------------------------------------------------------------------------------------------------
 -- FUNCTION: line_kill
 --
--- DATE: March 16, 2018
+-- DATE: January 23, 2018
 --
 -- REVISIONS: None
 --
