@@ -1,3 +1,36 @@
+/*------------------------------------------------------------------------------------------------------------------
+-- SOURCE FILE: PipesAndForks.c
+--
+-- PROGRAM: PipesAndForks
+--
+-- FUNCTIONS:
+-- void delete_char(char *str, int i) 
+-- char* line_kill(char *str, int i)
+-- int main(void)
+--
+--
+-- DATE: January 24, 2018
+--
+-- REVISIONS: None
+--
+-- DESIGNER: Tim Bruecker
+--
+-- PROGRAMMER: Tim Bruecker
+--
+-- NOTES:
+-- The program forms three processes:
+--      Input: Takes input from the user and sends it to output and translate.
+--      Output: Receives characters from input and translate and prints them to the console.
+--      Translate: Receives strings from input and applies control character to them, then sends the
+--                  results to output.
+--
+-- Control characters are: 'X' for erase, 'K' for line-kill, 'control-k' for interrupt 
+--                              (i.e. abnormal termination of the program) and 'T' for normal 
+--                               termination of the program.
+----------------------------------------------------------------------------------------------------------------------*/
+
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,14 +41,34 @@
 
 char* translater(char* word);
 
-/*
-Sourced from 
-https://stackoverflow.com/questions/18078008/
-c-delete-the-i-th-character-from-a-writable-char-array
-*/
+
 void delete_char(char *str, int i);
 char* line_kill(char *str, int i);
 
+
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION: main
+--
+-- DATE: March 16, 2018
+--
+-- REVISIONS: None
+--
+-- DESIGNER: Tim Bruecker
+--
+-- PROGRAMMER: Tim Bruecker
+--
+-- INTERFACE: int main(void)
+--
+-- RETURNS: void
+--
+-- NOTES:
+-- This function is the entry point for the program. Main splits into the three processes 
+-- mentioned in the program header. Input handles taking character by character input from the user, and
+-- buffers a string to send to translate. The string is sent to translate when the 'E' or 'T' characters are read.
+-- If a ctrl-k character is read, the program quits abruptly. Output reads character by character from a pipe and 
+-- writes those characters to stdout. Translate uses the translation functions to apply transformations to the strings
+-- it receives from input.
+----------------------------------------------------------------------------------------------------------------------*/
 int main(void)
 {
 
@@ -30,7 +83,7 @@ int main(void)
 	pipe(inputOutput);
 	pipe(inputTranslate);
 
-	system ("/bin/stty raw");
+	system ("/bin/stty raw igncr -echo");
 
 
 	if((childpid1 = fork()) == -1)
@@ -148,7 +201,27 @@ int main(void)
 }
 
 
-
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION: translater
+--
+-- DATE: March 16, 2018
+--
+-- REVISIONS: None
+--
+-- DESIGNER: Tim Bruecker
+--
+-- PROGRAMMER: Tim Bruecker
+--
+-- INTERFACE: char *translater(char *word)
+-- char *word: A string with control characters to be translated. Terminated with an 'E' or 'T' Character.
+--
+-- RETURNS: A translated string.
+--
+-- NOTES:
+-- This function is the managing function used to translate strings. It first applies the line_kill function
+-- and then applies the backspace characters through the string. After that it replaces all 'a's with 'z's, echos
+-- all other lower case letters, and deletes 'E's and 'T's.
+----------------------------------------------------------------------------------------------------------------------*/
 char *translater(char *word) {
     int len = strlen(word);
     int i;
@@ -196,12 +269,8 @@ char *translater(char *word) {
             //Delete T and shift up
             delete_char(word, i);
             final[i] = word[i];
-        }
-        else if(word[i] == 'K')
-        {
-            //Delete all chars up to and including K
-            line_kill(word, i);
-
+            len--;
+            i--;
         }
         else if(word[i] > 'a' && word[i] < 'z')
         {
@@ -211,6 +280,30 @@ char *translater(char *word) {
     return final;
 }
 
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION: delete_char
+--
+-- DATE: March 16, 2018
+--
+-- REVISIONS: None
+--
+-- DESIGNER: No Idea For Name
+--
+-- PROGRAMMER: No Idea For Name
+--
+-- INTERFACE: void delete_char(char *str, int i) 
+-- char *str: The string to operate on.
+-- int i: The location of the character to be deleted.
+--
+-- RETURNS: void
+--
+-- NOTES:
+-- This function deletes a character at the location given by i, by shifting the array up a spot after
+-- index i and appending a new null character.
+--
+-- Sourced from:
+-- https://stackoverflow.com/questions/18078008/c-delete-the-i-th-character-from-a-writable-char-array
+----------------------------------------------------------------------------------------------------------------------*/
 void delete_char(char *str, int i) 
 {
     int len = strlen(str);
@@ -223,6 +316,26 @@ void delete_char(char *str, int i)
     str[i] = '\0';
 }
 
+/*------------------------------------------------------------------------------------------------------------------
+-- FUNCTION: line_kill
+--
+-- DATE: March 16, 2018
+--
+-- REVISIONS: None
+--
+-- DESIGNER: Tim Bruecker
+--
+-- PROGRAMMER: Tim Bruecker
+--
+-- INTERFACE: char* line_kill(char *str, int i)
+-- char *str: The string to be operated on.
+-- int i: The location to delete up to.
+--
+-- RETURNS: A new string that has been line killed to index i.
+--
+-- NOTES:
+-- This function deletes all characters up to and including i, from str. Then returns the new string.
+----------------------------------------------------------------------------------------------------------------------*/
 char* line_kill(char *str, int i)
 {
     int len = strlen(str);
