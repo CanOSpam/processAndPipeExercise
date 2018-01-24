@@ -8,8 +8,13 @@
 
 char* translater(char* word);
 
-//Sourced from https://stackoverflow.com/questions/18078008/c-delete-the-i-th-character-from-a-writable-char-array
+/*
+Sourced from 
+https://stackoverflow.com/questions/18078008/
+c-delete-the-i-th-character-from-a-writable-char-array
+*/
 void delete_char(char *str, int i);
+char* line_kill(char *str, int i);
 
 int main(void)
 {
@@ -24,7 +29,7 @@ int main(void)
 
 	pipe(inputOutput);
 	pipe(inputTranslate);
-	
+
 	system ("/bin/stty raw");
 
 
@@ -148,7 +153,32 @@ char *translater(char *word) {
     int len = strlen(word);
     int i;
     char *final = malloc(len+1);
-    for(i=0; i<=len; i++) {         // include terminator
+    //Line Kill
+    for(i=0; i<=len; i++) {
+        if(word[i] == 'K')
+        {
+            word = line_kill(word, i);
+            int len = strlen(word);
+            final = realloc(final, len+1);
+            i = 0;
+        }
+    }
+
+    //Deletion
+    for(i=0; i<=len; i++) {
+        if(word[i] == 'X')
+        {
+            delete_char(word, i);
+            len--;
+            i--;
+            delete_char(word, i);
+            len--;
+            i--;
+        }
+    }   
+
+    //Handle other control characters
+    for(i=0; i<=len; i++) {
         if(word[i] == 'a')
         {
             final[i] = 'z';
@@ -158,6 +188,8 @@ char *translater(char *word) {
             //Delete E and shift up
             delete_char(word, i);
             final[i] = word[i];
+            len--;
+            i--;
         }
         else if(word[i] == 'T')
         {
@@ -165,15 +197,13 @@ char *translater(char *word) {
             delete_char(word, i);
             final[i] = word[i];
         }
-        else if(word[i] == 'X')
+        else if(word[i] == 'K')
         {
-            //Delete X and previous char and shift up
-            delete_char(word, i);
-            delete_char(word, i - 1);
-            final[i - 1] = word[i];
+            //Delete all chars up to and including K
+            line_kill(word, i);
 
         }
-        else
+        else if(word[i] > 'a' && word[i] < 'z')
         {
             final[i] = word[i];
         }
@@ -181,7 +211,8 @@ char *translater(char *word) {
     return final;
 }
 
-void delete_char(char *str, int i) {
+void delete_char(char *str, int i) 
+{
     int len = strlen(str);
 
     for (; i < len - 1 ; i++)
@@ -190,4 +221,17 @@ void delete_char(char *str, int i) {
     }
 
     str[i] = '\0';
+}
+
+char* line_kill(char *str, int i)
+{
+    int len = strlen(str);
+    char *final = malloc(len+1 - i);
+
+    for(int j = 0; i < len; i++, j++)
+    {
+        final[j] = str[i];
+    }
+
+    return final;
 }
