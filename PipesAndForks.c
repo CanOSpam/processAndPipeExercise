@@ -272,7 +272,7 @@ char *translater(char *word) {
             len--;
             i--;
         }
-        else if(word[i] >= 'b' && word[i] <= 'z')
+        else if(word[i] >= 'b' && word[i] <=T 'z')
         {
             final[i] = word[i];
         }
@@ -338,6 +338,7 @@ void delete_char(char *str, int i)
 ----------------------------------------------------------------------------------------------------------------------*/
 char* line_kill(char *str, int i)
 {
+    //Delete a line up to K
     int len = strlen(str);
     char *final = malloc(len+1 - i);
 
