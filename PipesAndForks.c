@@ -272,7 +272,7 @@ char *translater(char *word) {
             len--;
             i--;
         }
-        else if(word[i] > 'a' && word[i] < 'z')
+        else if(word[i] > 'b' && word[i] < 'z')
         {
             final[i] = word[i];
         }
